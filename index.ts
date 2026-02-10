@@ -1,37 +1,18 @@
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// // server.tool(
-// //   {
-// //     name: "get_sap_objects",
-// //     description: "Busca objetos SAP",
-// //   },
-// //   async () => {
-// //     return object({
-// //       name: "SAP DLAcademy",
-// //       objects: [
-// //         { name: "YGDF1", type: "REPORT", font: "WRITE: 'Gabriel 1'." },
-// //         { name: "YGDF2", type: "CLASS", font: "" },
-// //       ],
-// //     });
-// //   },
-// // );
-
 import { MCPServer, text, object } from "mcp-use/server";
 import { z } from "zod";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Create server instance
 const server = new MCPServer({
+  host: "0.0.0.0",
   name: "dl_sap_mcp",
   title: "DL SAP MCP",
   version: "1.0.0",
   description: "Descomplicando Linguagens - SAP MCP",
   favicon: "logo-tab.ico",
-  host: "0.0.0.0",
-  // websiteUrl: "https://www.descomplicandolinguagens.com.br/",
   icons: [
     {
       src: "logo-tab.ico",
@@ -74,32 +55,6 @@ if (fs.existsSync(bestPracticesDir)) {
     }
   }
 }
-
-// // Define a simple tool
-// server.tool(
-//   {
-//     name: "greet",
-//     description: "Greet someone by name",
-//     schema: z.object({
-//       name: z.string().describe("The name of the person to greet"),
-//     }),
-//   },
-//   async ({ name }) => text(`Hello, ${name}! Welcome to MCP.`),
-// );
-
-// // Define a resource
-// server.resource(
-//   {
-//     name: "config",
-//     uri: "config://settings",
-//     description: "Server configuration",
-//   },
-//   async () =>
-//     object({
-//       theme: "dark",
-//       language: "en",
-//     }),
-// );
 
 // Start the server
 await server.listen(3000);
