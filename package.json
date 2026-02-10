@@ -21,7 +21,7 @@
   ],
   "main": "dist/index.js",
   "scripts": {
-    "build": "node --experimental-require-module ./node_modules/mcp-use/dist/src/bin.js build",
+    "build": "node --experimental-require-module ./node_modules/mcp-use/dist/src/bin.js build && cp -r resources dist/resources",
     "dev": "node --experimental-require-module ./node_modules/mcp-use/dist/src/bin.js dev",
     "start": "node --experimental-require-module ./node_modules/mcp-use/dist/src/bin.js start",
     "deploy": "node --experimental-require-module ./node_modules/mcp-use/dist/src/bin.js deploy"

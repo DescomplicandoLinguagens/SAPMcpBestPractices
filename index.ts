@@ -33,39 +33,39 @@ server.tool(
   async ({ name }) => text(`Hello, ${name}! Welcome to MCP.`),
 );
 
-// const bestPracticesDir = path.join(__dirname, "resources", "best-practices");
+const bestPracticesDir = path.join(__dirname, "resources", "best-practices");
 
-// if (fs.existsSync(bestPracticesDir)) {
-//   const files = fs.readdirSync(bestPracticesDir);
+if (fs.existsSync(bestPracticesDir)) {
+  const files = fs.readdirSync(bestPracticesDir);
 
-//   for (const file of files) {
-//     if (path.extname(file) === ".md") {
-//       const resourceName = path.basename(file, ".md");
-//       const title = resourceName
-//         .split("-")
-//         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-//         .join(" ");
+  for (const file of files) {
+    if (path.extname(file) === ".md") {
+      const resourceName = path.basename(file, ".md");
+      const title = resourceName
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
 
-//       server.resource(
-//         {
-//           uri: `file:///best-practices/${resourceName}`,
-//           name: title,
-//           description: `Guia de boas práticas: ${title}`,
-//           mimeType: "text/markdown",
-//         },
-//         async () => {
-//           const filePath = path.join(bestPracticesDir, file);
-//           try {
-//             const content = fs.readFileSync(filePath, "utf-8");
-//             return text(content);
-//           } catch (error) {
-//             return text(`Erro ao carregar o recurso ${title}.`);
-//           }
-//         },
-//       );
-//     }
-//   }
-// }
+      server.resource(
+        {
+          uri: `file:///best-practices/${resourceName}`,
+          name: title,
+          description: `Guia de boas práticas: ${title}`,
+          mimeType: "text/markdown",
+        },
+        async () => {
+          const filePath = path.join(bestPracticesDir, file);
+          try {
+            const content = fs.readFileSync(filePath, "utf-8");
+            return text(content);
+          } catch (error) {
+            return text(`Erro ao carregar o recurso ${title}.`);
+          }
+        },
+      );
+    }
+  }
+}
 
 // Start the server
 await server.listen(3000);
