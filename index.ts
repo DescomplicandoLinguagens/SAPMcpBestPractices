@@ -11,6 +11,7 @@ const server = new MCPServer({
   version: "1.0.0",
   description: "Descomplicando Linguagens - SAP MCP",
   favicon: "logo-tab.ico",
+  host: "0.0.0.0",
   // websiteUrl: "https://www.descomplicandolinguagens.com.br/",
   icons: [
     {
@@ -71,4 +72,5 @@ if (fs.existsSync(bestPracticesDir)) {
   }
 }
 
-await server.listen(3000);
+const port = parseInt(process.env.PORT || "3000", 10);
+await server.listen(port);
