@@ -71,3 +71,5 @@ if (fs.existsSync(bestPracticesDir)) {
     }
   }
 }
+
+await server.listen(3000);
