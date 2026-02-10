@@ -14,7 +14,12 @@ COPY . .
 # Agora o build deve funcionar com a flag experimental
 RUN npm run build
 
+# Garante que as variáveis de ambiente de porta estejam corretas
+ENV PORT=3000
+ENV HOST=0.0.0.0
+
 EXPOSE 3000
 
-# Verifique se o arquivo de saída é realmente dist/index.js
-CMD ["node", "dist/index.js"]
+# Tente rodar via npm start em vez de chamar o node direto no dist
+# Isso geralmente resolve caminhos de arquivos relativos
+CMD ["npm", "run", "start"]
