@@ -22,15 +22,71 @@ const server = new MCPServer({
   ],
 });
 
+// server.tool(
+//   {
+//     name: "greet",
+//     description: "Greet someone by name",
+//     schema: z.object({
+//       name: z.string().describe("The name of the person to greet"),
+//     }),
+//   },
+//   async ({ name }) => text(`Hello, ${name}! Welcome to MCP.`),
+// );
+
 server.tool(
   {
-    name: "greet",
-    description: "Greet someone by name",
+    name: "list_best_practices",
+    description: "List all available best practice guidelines",
+  },
+  async () => {
+    const bestPracticesDir = path.join(
+      __dirname,
+      "resources",
+      "best-practices",
+    );
+    if (!fs.existsSync(bestPracticesDir)) {
+      return text("No best practices directory found.");
+    }
+    const files = fs
+      .readdirSync(bestPracticesDir)
+      .filter((file) => path.extname(file) === ".md")
+      .map((file) => path.basename(file, ".md"));
+
+    return text(`Available best practices:\n- ${files.join("\n- ")}`);
+  },
+);
+
+server.tool(
+  {
+    name: "read_best_practice",
+    description: "Read a specific best practice guideline",
     schema: z.object({
-      name: z.string().describe("The name of the person to greet"),
+      name: z
+        .string()
+        .describe(
+          "The name of the best practice to read (e.g. 'abap-classic')",
+        ),
     }),
   },
-  async ({ name }) => text(`Hello, ${name}! Welcome to MCP.`),
+  async ({ name }) => {
+    const bestPracticesDir = path.join(
+      __dirname,
+      "resources",
+      "best-practices",
+    );
+    const filePath = path.join(bestPracticesDir, `${name}.md`);
+
+    if (!fs.existsSync(filePath)) {
+      return text(`Best practice '${name}' not found.`);
+    }
+
+    try {
+      const content = fs.readFileSync(filePath, "utf-8");
+      return text(content);
+    } catch (error) {
+      return text(`Error reading best practice '${name}'.`);
+    }
+  },
 );
 
 const bestPracticesDir = path.join(__dirname, "resources", "best-practices");
