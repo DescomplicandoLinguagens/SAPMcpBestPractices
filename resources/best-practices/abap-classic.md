@@ -73,6 +73,9 @@ As CDS Views devem ser organizadas em camadas seguindo o princípio do **Virtual
 | **Composite**   | `ZI_` ou `ZR_` | **ZI** para quando há reutilização; **ZR** quando restrito a um contexto de negócio.                                       |
 | **Consumption** | `ZC_`          | Camada de consumo final para a UI.                                                                                         |
 
+**_ Hierarquia de CDS _**
+Tabela -> Basic -> Composite -> Consumption
+
 #### 1.2. Padrões Adicionais de CDS
 
 - **Search Help**: Para CDS utilizadas como Search Help, utilizar o sufixo `_SH` (ex: `ZI_SD_PEDIDO_SH`).

@@ -4,11 +4,11 @@
 
 A nomenclatura para a criação de aplicativos nas ferramentas de desenvolvimento deve seguir as regras abaixo:
 
-| Objeto                                | Regra                                                                                 | Exemplo                 |
-| :------------------------------------ | :------------------------------------------------------------------------------------ | :---------------------- |
-| **Nome do APP (Module Name)**         | Deve iniciar com `Z` seguido de uma descrição aberta com no máximo **21 caracteres**. | `ZTROCA_EMAIL`          |
-| **Namespace (Application Namespace)** | Deve ser obrigatoriamente o valor fixo.                                               | `[com/pt/br].[empresa]` |
-| **Objeto BSP (Deploy)**               | Utilize o prefixo `ZZ1` seguido do nome do APP abreviado (máximo **12 caracteres**).  | `ZZ1TROCAEM`            |
+| Objeto                                | Regra                                                                                 | Exemplo                       |
+| :------------------------------------ | :------------------------------------------------------------------------------------ | :---------------------------- |
+| **Nome do APP (Module Name)**         | Deve iniciar com `Z` seguido de uma descrição aberta com no máximo **21 caracteres**. | `ZTROCA_EMAIL`                |
+| **Namespace (Application Namespace)** | Deve ser obrigatoriamente o valor fixo.                                               | `[com ou pt ou br].[empresa]` |
+| **Objeto BSP (Deploy)**               | Utilize o prefixo `ZZ1` seguido do nome do APP abreviado (máximo **12 caracteres**).  | `ZZ1TROCAEM`                  |
 
 ## 2. Configurações no Fiori Launchpad Designer
 
