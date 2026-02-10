@@ -22,6 +22,17 @@ const server = new MCPServer({
   ],
 });
 
+server.tool(
+  {
+    name: "greet",
+    description: "Greet someone by name",
+    schema: z.object({
+      name: z.string().describe("The name of the person to greet"),
+    }),
+  },
+  async ({ name }) => text(`Hello, ${name}! Welcome to MCP.`),
+);
+
 const bestPracticesDir = path.join(__dirname, "resources", "best-practices");
 
 if (fs.existsSync(bestPracticesDir)) {
