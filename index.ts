@@ -82,6 +82,7 @@ import { z } from "zod";
 const server = new MCPServer({
   name: "my-mcp-server",
   version: "1.0.0",
+  host: "0.0.0.0",
   description: "My first MCP server",
 });
 
