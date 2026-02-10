@@ -10,7 +10,7 @@ const server = new MCPServer({
   title: "DL SAP MCP",
   version: "1.0.0",
   description: "Descomplicando Linguagens - SAP MCP",
-  baseUrl: process.env.MCP_URL || "http://localhost:3000",
+  //baseUrl: process.env.MCP_URL || "http://localhost:3000",
   favicon: "logo-tab.ico",
   websiteUrl: "https://www.descomplicandolinguagens.com.br/",
   icons: [
