@@ -76,7 +76,7 @@ ALV IDA:
 
 Adicionais:
 
-- Sempre Evitar utilizar FORMS/PERFORMS
+- Nunca sugerir FORMS/PERFORMS
 - Utilizar sempre que possivel INLINE Declarations do ABAP 7.40+
 - Sempre que possível utilizar o NEW para instanciar objetos
 - Não trabalhar com SELECT \*
