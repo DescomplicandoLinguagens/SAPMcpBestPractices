@@ -9,6 +9,10 @@ Regras REST:
     DATA(lo_router) = NEW cl_rest_router( ).
     lo_router->attach( iv_template = |/get_sales_order| iv_handler_class = |ZSDCL_SALES_ORDER| ).
     ro_root_handler = lo_router.
+- Publicar um Nó na SICF:
+  - EX: /sap/bc/icf/api_sd
+  - Sempre respeitando o conceito de módulos SAP
+  - O Handler deverá ter todas as rotas necessárias para o módulo
 
 Regras ODATA:
 
