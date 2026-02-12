@@ -85,3 +85,5 @@ Adicionais:
 - Sempre que necessário utilizar comentários no padrão XXX, TODO, FIXME
 - Caso precise, pode criar os eventos de toolbar na própria classe como métodos
 - Caso seja um ALV simples e esteja em S4Hana, pode sugerir a utilização de Aplicativos RAP
+- Evitar Loop aninhados
+- Sugerir sempre a utilização de Hashed Tables, Sorted Tables quando necessário para melhorar performance
