@@ -91,9 +91,6 @@
   - EX: ZBC_SD_SALES_ORDER
 
 
-Perfeito, vamos focar agora no pilar 01: Nomenclatura e Semântica. Para um Resource de MCP, a IA precisa entender que o ABAP moderno abandonou o padrão "húngaro" (aqueles prefixos de tipo) em favor de uma leitura mais natural, parecida com Java ou C#.
-
-Aqui está o detalhamento técnico focado em Naming Conventions para o seu servidor MCP:
 
 🏷️ Clean ABAP Resource: Naming & Semantics (Deep Dive)
 1. A Regra de Ouro: "No Encodings" (Sem Prefixos)
