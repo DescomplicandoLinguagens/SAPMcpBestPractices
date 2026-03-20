@@ -89,3 +89,67 @@
   - EX: ZTC_SD
 - Catálogo Negócio: ZBC\_[MODULO SAP]\_[AREA NEGOCIO]
   - EX: ZBC_SD_SALES_ORDER
+
+
+Perfeito, vamos focar agora no pilar 01: Nomenclatura e Semântica. Para um Resource de MCP, a IA precisa entender que o ABAP moderno abandonou o padrão "húngaro" (aqueles prefixos de tipo) em favor de uma leitura mais natural, parecida com Java ou C#.
+
+Aqui está o detalhamento técnico focado em Naming Conventions para o seu servidor MCP:
+
+🏷️ Clean ABAP Resource: Naming & Semantics (Deep Dive)
+1. A Regra de Ouro: "No Encodings" (Sem Prefixos)
+A IA deve ignorar a prática legada de indicar o tipo ou escopo no nome da variável.
+
+PROIBIDO (Legacy): lv_vbeln, ls_data, lt_items, mt_table, iv_id, rv_result.
+
+OBRIGATÓRIO (Clean): sales_order, data, items, id, result.
+
+Por que: O editor moderno (ADT/Eclipse) já mostra o tipo ao passar o mouse. O nome deve descrever o conteúdo, não o tipo técnico.
+
+2. Padrão de Escrita: Snake_Case
+Diferente de outras linguagens que usam CamelCase, o Clean ABAP padroniza tudo em minusculúsculas com underline.
+
+Exemplo: get_customer_details em vez de GetCustomerDetails.
+
+3. Classes e Interfaces
+Classes: Devem ser substantivos. Ex: cl_invoice_processor.
+
+Interfaces: Devem começar com IF_ seguido de um substantivo ou adjetivo. Ex: if_serializable.
+
+Instâncias: Não use lo_obj. Use o nome do que o objeto representa. Ex: processor = new cl_invoice_processor( ).
+
+4. Métodos (Verbos)
+Devem começar com um verbo que indique a ação.
+
+Getters: Use get_... para buscar valores.
+
+Checkers/Booleans: Use prefixos que indiquem pergunta, como is_..., has_..., can_..., should_....
+
+Exemplo: is_valid, has_items, should_calculate_tax.
+
+5. Parâmetros de Métodos
+Ao definir a assinatura de um método, a IA deve remover os prefixos i, e, c, r (importing, exporting, changing, returning).
+
+Ruim: IMPORTING iv_user_id TYPE string.
+
+Bom: IMPORTING user_id TYPE string.
+
+Contexto: Dentro do método, se houver conflito com variáveis locais, use me->user_id para referenciar o atributo da classe.
+
+6. Tabelas Internas (Pluralidade)
+Sempre use plural para tabelas e singular para estruturas/work areas.
+
+Exemplo: ```abap
+LOOP AT items INTO DATA(item). " Clean
+LOOP AT lt_items INTO ls_item. " Legacy (Evitar)
+
+
+7. Constantes e Enums
+Constantes: Devem ser descritivas. O Clean ABAP sugere evitar o prefixo co_ se o contexto for óbvio.
+
+Enums: Use tipos enumerados para substituir grupos de constantes relacionadas.
+
+TYPES: BEGIN OF ENUM size,
+         small,
+         medium,
+         large,
+       END OF ENUM size.
