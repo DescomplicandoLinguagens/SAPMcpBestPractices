@@ -87,3 +87,4 @@ Adicionais:
 - Caso seja um ALV simples e esteja em S4Hana, pode sugerir a utilização de Aplicativos RAP
 - Evitar Loop aninhados
 - Sugerir sempre a utilização de Hashed Tables, Sorted Tables quando necessário para melhorar performance
+- Não sugerir FORMS, evitar ao máximo, ou criar Classes Locais ou na SE24
