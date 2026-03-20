@@ -1,83 +1,180 @@
-1. Princípios Gerais e Nomes
-Use nomes descritivos: Nomes devem revelar a intenção e o conteúdo. Evite focar no tipo de dado ou codificação técnica.
+Clean ABAP
+This guide is an adoption of Robert C. Martin's Clean Code adapted for ABAP.
+How to
 
-Domínio da solução e do problema: Prefira termos que façam sentido para o negócio ou para a arquitetura do software.
+How to Get Started with Clean Code
+How to Refactor Legacy Code
+How to Check Automatically
+How to Relate to Other Guides
+How to Disagree
 
-Use plural: Utilize para coleções e tabelas.
+Names
 
-Nomes pronunciáveis: Evite siglas obscuras ou combinações de letras impronunciáveis.
+Use descriptive names
+Prefer solution domain and problem domain terms
+Use plural where appropriate (especially for collections)
+Use pronounceable names
+Use snake_case
+Avoid abbreviations
+Use the same abbreviations consistently everywhere
+Use nouns for classes and verbs for methods
+Avoid noise words such as "data", "info", "object"
+Pick one word per concept
+Use pattern names only if you actually mean and implement that pattern
+Avoid encodings, especially Hungarian notation and any kind of prefixes
+Avoid obscuring built-in functions with your own names
 
-Snake_case: O padrão para nomes no ABAP deve seguir o uso de sublinhados.
+Language
 
-Evite abreviações: A menos que sejam amplamente conhecidas e usadas consistentemente em todo o projeto.
+Mind the legacy – balance modernization with readability and maintainability
+Mind the performance – clean code should not come at unacceptable cost
+Prefer object orientation to procedural programming
+Prefer functional to procedural language constructs
+Avoid obsolete language elements
+Use design patterns wisely – only when they clearly improve the code
 
-Substantivos para classes e Verbos para métodos: Classes representam objetos; métodos representam ações.
+Constants
 
-Evite palavras de ruído: Remova termos como "data", "info", "object" ou "table" dos nomes se eles não agregarem valor real.
+Use constants instead of magic numbers and magic strings
+Constants also need descriptive names
+Prefer ENUM (or enumeration classes) to constants interfaces
+If ENUM or enumeration patterns are not used, group related constants logically
 
-Um termo por conceito: Escolha uma palavra para uma ideia (ex: "get" ou "read") e mantenha-a em todo o sistema.
+Variables
 
-Evite Notação Húngara: Não utilize prefixos técnicos (como lv_, mt_, gt_). O foco deve ser no significado, não no escopo ou tipo.
+Prefer inline declarations to up-front declarations
+Do not use variables outside of the statement block they are declared in
+Do not chain up-front declarations
+Do not use field symbols for dynamic data access unless truly necessary
+Choose the right targets for your loops (e.g. TABLE or ASSIGNING)
 
-2. Linguagem e Estilo
-Prefira Orientação a Objetos (OO): Use classes e interfaces em vez de programação procedural (fórmulas, módulos de função e sub-rotinas).
+Tables
 
-Elementos obsoletos: Evite palavras-chave e construções que foram substituídas por versões mais modernas (ex: use DATA(...) em vez de declarações separadas).
+Use the right table type for the use case
+Avoid DEFAULT KEY
+Prefer INSERT INTO TABLE to APPEND TO
+Prefer LINE_EXISTS to READ TABLE or LOOP AT when checking existence
+Prefer READ TABLE to LOOP AT when reading a single entry
+Prefer LOOP AT … WHERE to nested IF inside LOOP
+Avoid unnecessary table reads
 
-Constantes: Use constantes em vez de "números mágicos" ou strings fixas. Elas também precisam de nomes descritivos.
+Strings
 
-Enums: Prefira o uso de ENUM para conjuntos de valores relacionados em vez de interfaces de constantes.
+Use ` to define string literals
+Use | to assemble text (string templates)
 
-Declarações Inline: Prefira declarar variáveis no momento do uso para reduzir o escopo e melhorar a leitura.
+Booleans
 
-3. Tabelas Internas
-Tipo de tabela correto: Escolha entre STANDARD, SORTED ou HASHED com base na necessidade de performance e acesso.
+Use Booleans wisely – only for true yes/no decisions
+Use ABAP_BOOL for Boolean variables
+Use ABAP_TRUE and ABAP_FALSE for comparisons
+Use XSDBOOL to set Boolean variables from conditions
 
-Evite Chave Padrão (Default Key): Sempre defina chaves explicitamente para evitar comportamentos inesperados.
+Conditions
 
-Operações Modernas: Prefira INSERT INTO TABLE a APPEND. Use LINE_EXISTS para verificações de existência e VALUE para preenchimento.
+Try to make conditions positive
+Prefer IS NOT to NOT IS
+Consider using predicative method calls for Boolean methods
+Consider decomposing complex conditions into helper variables or methods
+Consider extracting complex conditions into appropriately named methods
 
-Filtros: Use LOOP AT ... WHERE em vez de processar todos os registros com um IF interno.
+Ifs
 
-4. Condições e Fluxo de Controle
-Condições Positivas: É mais fácil ler IF is_valid do que IF NOT is_invalid.
+No empty IF branches
+Prefer CASE to ELSE IF chains for multiple alternative conditions
+Keep the nesting depth low
 
-Extração de Condições: Se uma condição lógica for complexa, extraia-a para um método booleano com nome descritivo.
+Regular expressions
 
-Evite Ninhos (Nesting): Mantenha a profundidade de indentação baixa. Use cláusulas de guarda (fail fast) para sair do método cedo se algo estiver errado.
+Prefer simpler methods to regular expressions when possible
+Prefer basis checks to regular expressions when sufficient
+Consider assembling complex regular expressions from smaller, named parts
 
-CASE vs ELSE IF: Use CASE quando houver múltiplas alternativas para a mesma variável.
+Classes
+Object orientation
 
-5. Métodos e Classes
-Faça apenas uma coisa: Cada método deve ter uma única responsabilidade (Single Responsibility Principle).
+Prefer objects to static classes
+Prefer composition to inheritance
+Don't mix stateful and stateless behavior in the same class
 
-Tamanho: Mantenha os métodos pequenos e focados em um nível de abstração.
+Scope
 
-Parâmetros: Tente manter o número de parâmetros baixo (idealmente menos de 3).
+Global by default, local only where appropriate
+Use FINAL if the class is not designed for inheritance
+Members PRIVATE by default, PROTECTED only if really needed
+Consider using immutable objects instead of getters
+Use READ-ONLY sparingly
 
-Retorno: Prefira RETURNING a EXPORTING para métodos funcionais. Use CHANGING raramente.
+Constructors
 
-Visibilidade: Membros devem ser PRIVATE por padrão. Use PROTECTED apenas se necessário para herança e PUBLIC apenas para a interface externa.
+Prefer NEW to CREATE OBJECT
+If a global class is CREATE PRIVATE, leave the CONSTRUCTOR public
+Prefer multiple static creation methods to optional parameters
+Use descriptive names for multiple creation methods
+Make singletons only where multiple instances genuinely don't make sense
 
-Interfaces: Prefira programar voltado para interfaces em vez de implementações específicas para facilitar o desacoplamento e testes.
+Methods
+Calls
 
-6. Tratamento de Erros
-Exceções Baseadas em Classes: Use RAISE EXCEPTION em vez de códigos de retorno (subrc) ou mensagens clássicas.
+Don't call static methods through instance references
+Don't access types through instance references
+Prefer functional to procedural calls
+Omit RECEIVING when possible
+Omit the optional keyword EXPORTING
+Omit the parameter name in single-parameter calls
+Omit the self-reference me-> when calling instance attributes or methods
 
-Não silencie erros: Nunca deixe um bloco CATCH vazio sem tratamento ou log.
+Object orientation
 
-Exceções para erros reais: Não use exceções para controlar o fluxo normal do programa.
+Prefer instance methods to static methods
+Public instance methods should usually be part of an interface
 
-7. Comentários
-Código autoexplicativo: O melhor comentário é um código bem escrito e bem nomeado.
+Parameter Number
 
-Explique o "Porquê", não o "O quê": Não descreva o que o comando faz (o compilador já sabe), descreva a intenção ou a regra de negócio por trás.
+Aim for few IMPORTING parameters (ideally fewer than three)
+Split methods instead of adding OPTIONAL parameters
+Use PREFERRED PARAMETER sparingly
+RETURN, EXPORT, or CHANGE exactly one parameter
 
-Remova código comentado: Use o controle de versão (Git/CTS) para recuperar código antigo; não "estoque" lixo no arquivo atual.
+Parameter Types
 
-8. Formatação e Testes
-Consistência: Siga o padrão do time. Use o ABAP Formatter (Pretty Printer) de forma padronizada.
+Prefer RETURNING to EXPORTING
+RETURNING large tables is usually acceptable
+Use either RETURNING or EXPORTING or CHANGING, but not a combination
+Use CHANGING sparingly and only where it clearly fits the semantics
 
-Testes Unitários (ABAP Unit): Escreva código testável. O código de teste deve ser tão limpo quanto o código de produção.
+Parameter Names
 
-Injeção de Dependência: Use técnicas que permitam substituir dependências reais por objetos de teste (mocks/stubs).
+Good method names usually make parameter names (especially RETURNING) unnecessary or obvious
+
+Method Body
+
+Do one thing, do it well, do it only
+Focus on the happy path or error handling, but not both
+Descend one level of abstraction
+Keep methods small (ideally < 20 statements, optimal 3–5)
+
+Control flow
+
+Fail fast – validate and exit as early as possible
+There is no strong consensus on CHECK vs RETURN for early exits (both have trade-offs)
+Avoid CHECK outside the initialization section of a method
+
+Error Handling
+Messages
+
+Make messages easy to find (e.g. via where-used list in SE91)
+
+Return Codes
+
+Prefer exceptions to return codes
+
+Exceptions
+
+Exceptions are for errors, not for regular cases
+Use class-based exceptions
+Use own abstract super classes for your exception hierarchy
+Throw one main type of exception in most cases
+Use sub-classes to allow callers to distinguish error situations when needed
+Throw CX_STATIC_CHECK for expected, manageable exceptions
+Throw CX_NO_CHECK for usually unrecoverable situations
