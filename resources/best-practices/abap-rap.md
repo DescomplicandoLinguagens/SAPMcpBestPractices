@@ -14,7 +14,7 @@
 Regras:
 
 - Evitamos ao máximo utilizar JOINs
-- Sempre utilizar Associations ao invés de JOINs
+- Utilizar Associations ao invés de JOINs
 - Ao criar Behaviors devemos respeitar os RESTRICTS, ETAGS, MAPPINGS, etc.
 - Teremos sempre dois behaviors, um da Composite ROOT e o outro da Projection Consumption
 - Analisar sempre qual a necessidade de se implementar a classe do behavior de negócio para controlar eventos como Actions, Determinations, etc.
@@ -23,3 +23,9 @@ Regras:
 Refatoração de ALVS:
 Caso seja solicitado uma refatoração de ALVS, deve primeiro montar a hierarquida de selects, definir as Basics e Composites necessários, criar as Consumption e os Behaviors necessários,
 Sempre respeitando as regras de negócio, filtros e as melhores práticas da SAP.
+
+
+- Apenas FreeStyle se realmente houver necessidade.
+
+Padrão de CDSs para RAP:
+Tables -> Basics -> Composites -> Consumptions (Projections)
