@@ -1,1 +1,88 @@
-Guia de Referência: Clean ABAP & SOLID ClassesEste recurso estabelece as diretrizes para a criação de classes robustas no ecossistema SAP, equilibrando as particularidades da SE24 (Globais) e de programas/includes (Locais).1. Escopo e LocalizaçãoClasses Globais (SE24/ADT): Devem ser a regra. Favorecem o reuso, testes unitários (ABAP Unit) e o transporte entre ambientes.Classes Locais: Use apenas para lógica interna de um report específico ou como "Helper" que não possui utilidade fora daquele contexto.Dica: Em programas, defina a CLASS definition e implementation no final do código ou em um INCLUDE específico (_CL).2. Estrutura e Visibilidade (Encapsulamento)VisibilidadeUso RecomendadoPrincípio VinculadoPUBLICInterfaces e métodos de contrato. O "o que" a classe faz.Interface SegregationPROTECTEDAtributos/métodos para subclasses. Evite atributos públicos aqui.Open/ClosedPRIVATELógica interna e estado da classe. O "como" ela faz.EncapsulationFINAL: Use por padrão em classes que não foram desenhadas para serem herdadas. Isso evita comportamentos inesperados e otimiza a performance em tempo de execução.ABSTRACT: Use para definir "Blueprints". Classes abstratas não podem ser instanciadas, apenas herdadas.FRIENDS: Use com extrema cautela. Permite que uma classe acesse os componentes privados de outra. Útil quase exclusivamente para classes de teste (ABAP Unit) acessarem lógica interna.3. Instanciação: Static vs InstanceMembros de Instância (METHODS, DATA): São a norma. Representam um objeto com estado próprio. Essenciais para injeção de dependência.Membros Estáticos (CLASS-METHODS, CLASS-DATA): Use apenas para:Fábricas (Pattern Factory).Constantes ou Singletons reais.Métodos utilitários puros (que não dependem do estado da classe).Atenção: Excesso de métodos estáticos impede o "Mocking" em testes unitários.4. Interfaces: O Coração do DesacoplamentoSempre prefira programar para uma Interface em vez de uma Classe.Injeção de Dependência: Ao usar interfaces, você pode trocar a implementação real por um "Mock" durante os testes.Polimorfismo: Permite que diferentes classes executem a mesma ação de formas distintas (ex: ZIF_PROCESSOR implementado por ZCL_PDF_PROC e ZCL_XML_PROC).5. Aplicando SOLID no ABAPS - Single Responsibility (Responsabilidade Única)Uma classe deve ter apenas um motivo para mudar. Se sua classe seleciona dados do banco, processa lógica de negócio e gera um ALV, ela está errada.Prática: Separe em ZCL_..._DAO (Acesso a dados), ZCL_..._SERVICE (Lógica) e ZCL_..._UI (Saída).O - Open/Closed (Aberto/Fechado)Entidades devem estar abertas para extensão, mas fechadas para modificação.Prática: Use herança ou interfaces. Se precisar de um novo comportamento, crie uma nova classe que implemente a interface em vez de encher a classe original de IF/CASE.L - Liskov Substitution (Substituição de Liskov)Subclasses devem ser substituíveis por suas classes base sem quebrar a aplicação.Prática: Não sobrescreva um método da superclasse mudando drasticamente o comportamento esperado ou lançando exceções que a superclasse não previa.I - Interface Segregation (Segregação de Interface)Muitas interfaces específicas são melhores que uma interface genérica ("Fat Interface").Prática: Se uma classe implementa uma interface mas deixa 3 métodos vazios porque "não precisa deles", sua interface está grande demais.D - Dependency Inversion (Inversão de Dependência)Dependa de abstrações (Interfaces), não de implementações concretas.Prática: Não use CREATE OBJECT dentro da sua classe para dependências. Passe a instância da dependência no CONSTRUCTOR (Injeção de Dependência).6. Checklist de Boas Práticas (Resumo)Nomes: Classes ZCL_..., Interfaces ZIF_....Métodos: Curtos (idealmente até 30-50 linhas). Nomeie com verbos (Ex: CALCULATE_TOTAL).Exceções: Use classes de exceção (CX_STATIC_CHECK ou CX_DYNAMIC_CHECK). Evite EXCEPTIONS clássicas com SY-SUBRC.Atributos: Mantenha-os privados. Forneça métodos "Getter" se necessário.Readability: O código deve ser autoexplicativo. Use tipos expressivos (TYPE STRING em vez de TYPE C LENGTH 255 quando possível).
+# Guia Rápido – Melhores Práticas OO em ABAP (2026)
+
+## 1. Tipos de Classes no ABAP
+
+| Tipo              | Onde criar          | Visibilidade       | Quando usar (recomendação Clean ABAP / SOLID)                  | SOLID mais impactado |
+|-------------------|----------------------|--------------------|------------------------------------------------------------------|----------------------|
+| **Global**        | SE24 / Eclipse       | Sistema inteiro    | Reutilização ampla (frameworks, BOs, serviços, utilitários)     | D, I, O             |
+| **Local**         | Programa / Include   | Apenas no programa | Lógica específica do report / classe auxiliar temporária        | S                   |
+| **Test double**   | Local (test classes) | —                  | Unit Tests (mock / stub / fake)                                 | D                   |
+
+**Regra de ouro 2025+**  
+Prefira **globais** para tudo que possa ser reutilizado ou testado. Locais só para escopo muito restrito.
+
+## 2. Visibilidade (Encapsulamento)
+
+| Visibilidade   | Membros visíveis para…                              | Regra Clean ABAP / SOLID                              |
+|----------------|-----------------------------------------------------|-------------------------------------------------------|
+| **PUBLIC**     | Todo mundo                                          | Só o **contrato** essencial (interface pública)       |
+| **PROTECTED**  | Classe + subclasses                                 | Comportamento que subclasses podem precisar redefinir |
+| **PRIVATE**    | Apenas a própria classe                             | Implementação interna – **mantenha escondido**        |
+
+**Mnemônico**: "O menor privilégio possível" → o padrão deve ser **PRIVATE**.
+
+## 3. Instância vs Estático
+
+| Aspecto             | **Instância** (recomendado)                     | **Estático** (`CLASS-METHODS` / `CLASS-DATA`)     |
+|---------------------|--------------------------------------------------|----------------------------------------------------|
+| Estado              | Pode ter atributos de instância                  | Sem estado mutável (ou estado global = perigo)    |
+| Testabilidade       | Fácil (injetar dependências)                     | Difícil (não injetável)                            |
+| SOLID               | Suporta D, L, O                                  | Viola D e muitas vezes S                           |
+| Quando usar         | Quase sempre (BO, Service, Calculator, etc.)     | Helpers imutáveis, factory methods, constantes    |
+
+**Regra Clean ABAP**: Evite classes 100% estáticas (utility classes). Prefira instância + injeção.
+
+## 4. Herança vs Composição
+
+| Conceito          | Quando usar                                      | SOLID mais afetado | Recomendação ABAP moderna |
+|-------------------|--------------------------------------------------|--------------------|----------------------------|
+| **Herança**       | "É-um" relacionamento verdadeiro + reuso comum   | L, O               | **Evite herança profunda** (> 2 níveis) |
+| **Composição**    | "Tem-um" relacionamento                          | D, S               | **Preferida** na maioria dos casos |
+| **Delegação**     | Classe delega para outra (wrapper/facade)        | D, O               | Muito usada em ABAP RAP/BO |
+
+## 5. Abstract, Interface, Final
+
+| Construto       | Característica principal                          | Quando usar (Clean ABAP / SOLID)                               |
+|-----------------|---------------------------------------------------|-----------------------------------------------------------------|
+| **ABSTRACT CLASS** | Pode ter implementação + métodos abstratos       | Template com comportamento comum + extensão obrigatória (O,L)  |
+| **INTERFACE**   | Somente contrato (sem implementação)              | Múltipla "herança", contratos claros, injeção (D,I)            |
+| **FINAL**       | Não pode ser herdada                              | Proteger classes que não devem ser estendidas (defesa L + O)  |
+
+**Decisão rápida**  
+- Precisa de implementação padrão compartilhada? → **Abstract class**  
+- Precisa de múltipla herança ou contrato puro? → **Interface**  
+- Classe não deve ser estendida (ex: DTO, Value Object)? → **FINAL**
+
+## 6. Friends
+
+- **Uso principal**: Testes unitários (test class como friend para acessar private/protected)
+- **Uso em produção**: **Muito raro** e **desencorajado** (quebra encapsulamento)
+- **Regra**: Só use `FRIENDS` em classes de teste locais
+
+## 7. SOLID aplicado em ABAP – Resumo prático
+
+| Princípio | Nome                        | Tradução livre no ABAP                                      | Como violar (ruim)                                 | Como aplicar (bom)                                      |
+|-----------|-----------------------------|-------------------------------------------------------------|----------------------------------------------------|-----------------------------------------------------------------|
+| **S**     | Single Responsibility       | Uma classe → uma responsabilidade                          | Classe `ZCL_VENDA` que calcula, salva e envia email | `ZCL_VENDA_CALCULO`, `ZCL_VENDA_PERSISTENCIA`, `ZCL_EMAIL_SENDER` |
+| **O**     | Open/Closed                 | Aberta para extensão, fechada para modificação              | Alterar classe existente para novo tipo cliente    | Interface + novas classes concretas / Strategy pattern         |
+| **L**     | Liskov Substitution         | Subclasse deve ser substituível pela super sem quebrar     | Redefinir método e mudar completamente o contrato  | Respeitar pré/pós-condições da superclasse                     |
+| **I**     | Interface Segregation       | Interfaces pequenas e específicas                           | Interface gigante com 15 métodos                   | Várias interfaces pequenas (`IF_CALCULO`, `IF_PERSISTENCIA`)   |
+| **D**     | Dependency Inversion        | Dependa de abstrações, não de implementações                | `CREATE OBJECT lo_db ACCESS #ZCL_DB_REAL`          | Injeção via construtor / interface + factory                   |
+
+## Resumo – Checklist Rápido ao criar uma classe
+
+1. É reutilizável em outros programas? → **Global** (SE24)
+2. Tem estado? → **Instância** (evite 100% static)
+3. É um contrato que várias classes podem implementar? → **INTERFACE**
+4. Tem implementação compartilhada que subclasses usam? → **ABSTRACT CLASS**
+5. Não deve ser herdada? → **FINAL**
+6. Faz mais de uma coisa? → Divida (S)
+7. Alguém vai precisar trocar a dependência no teste? → Injeção via interface + construtor (D)
+8. Alguém vai precisar estender sem modificar? → Interface + novas classes concretas (O)
+9. Precisa acessar private para teste? → `FRIENDS` só na test class
+10. Interface muito grande? → Quebre em várias menores (I)
+
+**Frase para colar no monitor**  
+"Classes pequenas, interfaces finas, injeção no construtor, composição > herança, final por padrão."
+
+Boa codificação! 🚀
