@@ -20,7 +20,7 @@ const server = new MCPServer({
       sizes: ["512x512"],
     },
   ],
-});
+}); 
 
 server.tool(
   {

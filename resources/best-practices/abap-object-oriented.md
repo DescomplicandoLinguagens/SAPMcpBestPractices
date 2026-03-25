@@ -46,6 +46,30 @@ ENDCLASS.
 
 **Regra:** exponha o mínimo necessário. Comece `PRIVATE`, promova apenas quando houver motivo claro.
 
+**Objetos imutáveis (Immutable):** para objetos que nunca mudam após a construção, prefira atributos públicos `READ-ONLY` a métodos getter — mais simples e sem overhead:
+
+```abap
+" Preferido — imutável com READ-ONLY
+CLASS zcl_order_key DEFINITION PUBLIC FINAL CREATE PUBLIC.
+  PUBLIC SECTION.
+    METHODS constructor IMPORTING iv_id TYPE vbeln iv_year TYPE gjahr.
+    DATA order_id TYPE vbeln READ-ONLY.
+    DATA fiscal_year TYPE gjahr READ-ONLY.
+ENDCLASS.
+
+" Anti-pattern — getters desnecessários para imutável
+CLASS zcl_order_key DEFINITION PUBLIC FINAL CREATE PUBLIC.
+  PUBLIC SECTION.
+    METHODS get_order_id    RETURNING VALUE(rv_id)   TYPE vbeln.
+    METHODS get_fiscal_year RETURNING VALUE(rv_year) TYPE gjahr.
+  PRIVATE SECTION.
+    DATA mv_order_id    TYPE vbeln.
+    DATA mv_fiscal_year TYPE gjahr.
+ENDCLASS.
+```
+
+> **Atenção:** `READ-ONLY` só funciona na `PUBLIC SECTION` e ainda permite modificação pela própria classe e subclasses. Para objetos que **têm** valores mutáveis, não use atributos públicos — use métodos.
+
 ```abap
 CLASS zcl_order DEFINITION PUBLIC CREATE PUBLIC.
   PUBLIC SECTION.
@@ -318,6 +342,11 @@ ENDCLASS.
 [ ] Testa unitariamente?            → ABAP Unit + injeção de dependência
 [ ] Exceções tipadas?               → cx_* ao invés de SY-SUBRC
 [ ] Herança necessária?             → "é um"? Máx. 2 níveis.
+[ ] Objeto imutável?                → Atributos READ-ONLY ao invés de getters
+[ ] Parâmetros booleanos?           → Dividir em dois métodos distintos
+[ ] RETURNING ou EXPORTING único?   → Nunca misturar tipos de saída
+[ ] EXPORTING por referência?       → CLEAR no início do método
+[ ] Factory methods nomeados?       → Prefixo new_/create_/construct_ + complemento
 ```
 
 ---
@@ -333,6 +362,309 @@ ENDCLASS.
 | SY-SUBRC em vez de exceções            | Erros ignorados silenciosamente               | `cx_*` com mensagens descritivas        |
 | Classe com só métodos estáticos        | Namespace glorificado, difícil de testar      | Instanciar + injetar                    |
 | Parâmetros booleanos em métodos        | Baixa legibilidade, viola SRP                 | Dois métodos distintos                  |
+
+---
+
+---
+
+## 14. Chamadas de Métodos — Sintaxe Limpa
+
+### Prefira chamadas funcionais a procedurais
+
+```abap
+" Correto — chamada funcional
+DATA(result) = calculate_total( items ).
+
+modify->update( node           = my_bo=>node-item
+                key            = item->key
+                data           = item
+                changed_fields = changed_fields ).
+
+" Anti-pattern — CALL METHOD procedural (use apenas com dispatch dinâmico)
+CALL METHOD modify->update
+  EXPORTING
+    node           = my_bo=>node-item
+    key            = item->key.
+```
+
+### Omitir RECEIVING, EXPORTING e nome de parâmetro único
+
+```abap
+" Correto — inline compacto
+DATA(sum) = aggregate_values( values ).
+DATA(unique) = remove_duplicates( list ).
+
+" Anti-pattern — verboso sem necessidade
+aggregate_values(
+  EXPORTING
+    values = values
+  RECEIVING
+    result = DATA(sum) ).
+
+DATA(unique) = remove_duplicates( list = list ).  " parâmetro único não precisa de nome
+```
+
+> Quando o método tem um único parâmetro IMPORTING e ele é evidente, omita o nome. Se o nome ajuda a entender (ex.: `update( asynchronous = abap_true )`), mantenha.
+
+### Omitir me-> ao chamar método ou atributo de instância
+
+```abap
+" Correto
+DATA(result) = aggregate_values( values ).
+
+" Anti-pattern — me-> desnecessário
+DATA(result) = me->aggregate_values( me->values ).
+```
+
+> Use `me->` apenas quando há conflito de escopo entre variável local e atributo de instância:
+> ```abap
+> me->logger = logger.   " necessário: parâmetro e atributo têm o mesmo nome
+> ```
+
+### Chamar métodos estáticos pela classe, não pela instância
+
+```abap
+" Correto
+cl_uuid_generator=>generate( ).
+
+" Anti-pattern
+lo_instance->generate( ).   " generate é CLASS-METHOD — use =>
+```
+
+---
+
+## 15. Corpo do Método — Design Interno
+
+### Um método faz uma coisa, bem e apenas ela
+
+Indicadores de que um método faz **uma** coisa:
+- Poucos parâmetros IMPORTING (ideal ≤ 3)
+- Sem parâmetros booleanos
+- Exatamente um parâmetro de saída
+- ≤ 20 instruções (ideal 3–5)
+- Todas as instruções no mesmo nível de abstração
+
+### Foco: happy path **ou** tratamento de erro — nunca os dois misturados
+
+```abap
+" Anti-pattern — lógica de negócio misturada com validação
+METHOD append_xs.
+  IF input > 0.
+    DATA(remainder) = input.
+    WHILE remainder > 0.
+      result = result && `X`.
+      remainder = remainder - 1.
+    ENDWHILE.
+  ELSEIF input = 0.
+    RAISE EXCEPTION NEW zcx_invalid_input( ).
+  ELSE.
+    RAISE EXCEPTION NEW cx_sy_illegal_argument( ).
+  ENDIF.
+ENDMETHOD.
+
+" Correto — validação separada em método próprio
+METHOD append_xs.
+  validate_input( input ).
+  DATA(remainder) = input.
+  WHILE remainder > 0.
+    result = result && `X`.
+    remainder = remainder - 1.
+  ENDWHILE.
+ENDMETHOD.
+
+METHOD validate_input.
+  IF input = 0.
+    RAISE EXCEPTION NEW zcx_invalid_input( ).
+  ENDIF.
+  IF input < 0.
+    RAISE EXCEPTION NEW cx_sy_illegal_argument( ).
+  ENDIF.
+ENDMETHOD.
+```
+
+### Descer apenas um nível de abstração por método
+
+```abap
+" Correto — método orquestra chamadas no mesmo nível de abstração
+METHOD create_and_publish.
+  post = create_post( user_input ).
+  post->publish( ).
+ENDMETHOD.
+
+" Anti-pattern — mistura alto nível (publish) com baixo nível (trim/to_upper)
+METHOD create_and_publish.
+  post = NEW blog_post( ).
+  DATA(user_name) = trim( to_upper( sy-uname ) ).
+  post->set_author( user_name ).
+  post->publish( ).
+ENDMETHOD.
+```
+
+### Manter métodos pequenos
+
+- **Ideal:** 3–5 instruções
+- **Máximo:** ~20 instruções
+- Se o método precisa de muitas declarações `DATA` up-front → sinal de que faz coisas demais
+
+---
+
+## 16. Controle de Fluxo
+
+### Falhar rápido (Fail Fast)
+
+Valide e lance exceção o mais cedo possível — antes de operações custosas:
+
+```abap
+" Correto — valida logo no início
+METHOD process.
+  IF iv_input IS INITIAL.
+    RAISE EXCEPTION NEW cx_sy_illegal_argument( ).
+  ENDIF.
+  DATA(lo_obj) = build_expensive_object_from( iv_input ).
+  rv_result = lo_obj->calculate( ).
+ENDMETHOD.
+
+" Anti-pattern — valida tarde, depois de trabalho caro
+METHOD process.
+  DATA(lo_obj) = build_expensive_object_from( iv_input ).
+  IF lo_obj IS NOT BOUND.
+    RAISE EXCEPTION NEW cx_sy_illegal_argument( ).
+  ENDIF.
+  rv_result = lo_obj->calculate( ).
+ENDMETHOD.
+```
+
+### CHECK vs. RETURN na inicialização do método
+
+Prefira `IF ... RETURN.` ao `CHECK` — intenção mais explícita:
+
+```abap
+" Preferido — intenção explícita
+METHOD read_customizing.
+  IF keys IS INITIAL.
+    RETURN.
+  ENDIF.
+  " lógica principal
+ENDMETHOD.
+
+" Aceitável mas menos claro
+METHOD read_customizing.
+  CHECK keys IS NOT INITIAL.
+  " lógica principal
+ENDMETHOD.
+
+" Anti-pattern — nesting desnecessário
+METHOD read_customizing.
+  IF keys IS NOT INITIAL.
+    " lógica principal
+  ENDIF.
+ENDMETHOD.
+```
+
+### Não use CHECK fora da inicialização do método
+
+`CHECK` dentro de `LOOP` continua para a próxima iteração (não sai do método). Use `IF ... CONTINUE.`:
+
+```abap
+" Correto — dentro de loop
+LOOP AT lt_items INTO DATA(ls_item).
+  IF ls_item-active = abap_false.
+    CONTINUE.
+  ENDIF.
+  process_item( ls_item ).
+ENDLOOP.
+
+" Anti-pattern — CHECK em loop confunde: sai do loop ou do método?
+LOOP AT lt_items INTO DATA(ls_item).
+  CHECK ls_item-active = abap_true.
+  process_item( ls_item ).
+ENDLOOP.
+```
+
+---
+
+## 17. Design de Parâmetros de Métodos
+
+### Tipos de parâmetro de saída
+
+- Preferir `RETURNING` a `EXPORTING` — permite chamada funcional e method chaining
+- Usar **apenas um** tipo de saída por método: `RETURNING` **ou** `EXPORTING` **ou** `CHANGING`, nunca combinados
+- `RETURNING` tabelas grandes é aceitável (kernel ABAP otimiza o repasse)
+- `CHANGING` apenas quando uma variável local já preenchida precisa ser atualizada parcialmente
+
+```abap
+" Correto — RETURNING para saída única
+METHODS calculate_discount
+  IMPORTING iv_amount   TYPE decfloat34
+  RETURNING VALUE(rv_discount) TYPE decfloat34.
+
+" Anti-pattern — mistura de tipos de saída
+METHODS calculate_discount
+  IMPORTING  iv_amount      TYPE decfloat34
+  RETURNING  VALUE(rv_disc) TYPE decfloat34
+  EXPORTING  ev_error_flag  TYPE abap_bool.   " <— errado
+```
+
+### Parâmetros booleanos — dividir em dois métodos
+
+Parâmetros booleanos geralmente indicam que o método faz **duas coisas**. Divida:
+
+```abap
+" Anti-pattern — booleano obscurece a intenção
+METHODS update IMPORTING iv_save TYPE abap_bool.
+update( abap_true ).  " o que significa true aqui?
+
+" Correto — dois métodos com nomes descritivos
+METHODS update_without_saving.
+METHODS update_and_save.
+```
+
+### Nomear o parâmetro RETURNING como RESULT (ou rv_result)
+
+Se o nome do método já é descritivo o suficiente, use simplesmente `rv_result` (ou `result`) para o `RETURNING`. Nomes que repetem o método criam conflito com atributos da classe:
+
+```abap
+" Anti-pattern — nome do retorno conflita com atributo
+METHODS get_name RETURNING VALUE(name) TYPE string.
+METHOD get_name.
+  name = me->name.  " ambíguo: me-> necessário
+ENDMETHOD.
+
+" Correto — usar rv_result evita o conflito
+METHODS get_name RETURNING VALUE(rv_result) TYPE string.
+METHOD get_name.
+  rv_result = mv_name.
+ENDMETHOD.
+```
+
+### Parâmetros EXPORTING por referência — limpar antes de usar
+
+Parâmetros `EXPORTING` por referência (sem `VALUE`) apontam para memória existente — podem conter dados do chamador. Limpe-os explicitamente no início:
+
+```abap
+METHODS get_result
+  EXPORTING result TYPE zs_result.
+
+METHOD get_result.
+  CLEAR result.   " garante estado limpo
+  " ... preenche result
+ENDMETHOD.
+```
+
+> Parâmetros `VALUE(...)` já são áreas de memória novas e vazias — **não** precisam de `CLEAR`.
+
+### Métodos factory — nomes descritivos com prefixo new_/create_/construct_
+
+```abap
+" Correto — prefixo + complemento descritivo
+CLASS-METHODS create_from_template  IMPORTING io_template TYPE REF TO zif_order.
+CLASS-METHODS create_empty          RETURNING VALUE(ro_result) TYPE REF TO zcl_order.
+CLASS-METHODS new_from_id           IMPORTING iv_id TYPE vbeln.
+
+" Anti-pattern
+CLASS-METHODS create_1 IMPORTING ...
+CLASS-METHODS create_2 IMPORTING ...
+```
 
 ---
 
