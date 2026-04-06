@@ -1,110 +1,232 @@
-1. Technical & System Administration
-1.1 ABAP Data Dictionary & Workbench
-DD01L / DD04L: Domains and Data Elements
-DD02L / DD02T: Table headers and descriptions
-DD03L / DD03T: Table fields and descriptions
-DD09L: Technical settings of tables
-TADIR / TRDIR: Repository object directory and Program sources
-TFDIR / TFTIT: Function modules and short texts
-TSTC / TSTCT: Transaction codes and texts
-D020T: Screen texts
-TDEVC / TDEVCT: Development classes (Packages) and texts
+ABAP & SAP Data Dictionary Tables
+Core Data Dictionary Objects
 
-1.2 User Administration & Security
-USR01 / USR02: User master and Logon data (lock status)
-USR03 / USR21: User address data and Address key assignment
-USR04 / UST04: User authorizations and Profiles
-TOBJ / TOBC: Authorization objects and Classes
-USR40: Prohibited passwords
-DEVACCESS: Developer keys
+DD01L – Domains
+DD04L / DD04T – Data Elements
+DD02L / DD02T / DD02V – SAP Tables (Headers + Texts)
+DD03L / DD03T / DD03VT – Table Fields
+DD07L / DD07V – Fixed Values for Domains
+DD09L – Technical Settings of Tables
+DD12L – Secondary Indices
+DM42S – Table Relationships (SE11)
 
-1.3 System Monitoring & Logs
-SNAP: ABAP Runtime errors (Dumps)
-CDHDR / CDPOS: Change document header and positions
-TBTCO / TBTCP: Background job status and step overview
-DBTABLOG: Log records of table changes
-APQI / APQD: Batch input queue info and data
-E070 / E071: Transport request headers and tasks
+Repository & Development Objects
 
-1.4 Spool, Text & Business Address Services (BAS)
-TSP01 / TSP02: Spool requests and Print requests
-STXH / STXL: SAPscript text file header and lines
-ADRC: Master addresses (BAS)
-ADRP / ADCP: Person data and Address/Person assignment
+TADIR / TADIR-T – Directory of Repository Objects
+TRDIR – ABAP Programs / Report Sources
+TFDIR / TFTIT – Function Modules + Short Texts
+ENLFDIR – Additional Attributes of Function Modules
+TMDIR – Methods in Classes
+SEOCLASS – ABAP Objects Classes
+TDEVC / TDEVCT – Development Classes / Packages
+D020S / D020T – Screen Short Description + Texts
+TSE05 – ABAP Editor Insert Commands
+TAPLT – Program Application Long Texts
+D010TAB – Where-Used: Report → Tables
 
-2. General Customizing (Global Settings)
-T005: Countries
-TCURC / TCURT: Currency codes and names
-TCURR / TCURX: Exchange rates and Decimal places
-T006: Units of measure
-T247 / T015M: Month names
-TFACD: Factory calendar definition
-TTZZ / TTZD: Time zones and Summer time rules
+Transactions & Messages
 
-3. Enterprise Structure
-T880 / T001: Company and Company Code
-TKA01 / TKA02: Controlling Area and assignment to Company Code
-T001W / T001L: Plants and Storage Locations
-TVKO / TVTW / TSPA: Sales Org, Distribution Channel, and Division
-T024E / T024W: Purchasing Org and assignment to Plant
-TVST: Shipping Point
+TSTC / TSTCT – Transaction Codes + Texts
+TSTCP – Transaction Parameters
+T100 – Messages
 
-4. Master Data
-4.1 Material Master
-MARA / MAKT: General data and Descriptions
-MARC: Plant data
-MARD: Storage location data
-MVKE: Sales data
-MBEW: Valuation data
-MARM: Units of measure conversion
+Other Technical Tables
 
-4.2 Customer & Vendor Master
-KNA1 / KNB1: Customer general data and Company code data
-KNVV: Customer sales data
-KNVP: Customer partner functions
-LFA1 / LFB1: Vendor general data and Company code data
-LFM1 / LFM2: Vendor purchasing organization data
+SYST – ABAP System Fields (Structure)
+VBMOD – Update Function Modules (Registered)
+VBDATA – Update Data
+FILEPATH / PATH – Logical & Physical File Names
+DDSHPVAL5 – Personal Help Values
 
-4.3 Classification & Characteristics
-CABN / CABNT: Characteristics and descriptions
-KLAH: Class header
-KSSK: Allocation of Object to Class
-AUSP: Characteristic values
 
-5. Functional Modules
-5.1 Financial Accounting (FI/CO)
-SKA1 / T004: G/L Accounts and Chart of Accounts
-BKPF / BSEG: Accounting document header and items
-BSID / BSAD: Customer open/cleared items
-BSIK / BSAK: Vendor open/cleared items
-BNKA / T012: Bank master and House banks
-CSKS / CSKT: Cost Center master and texts
+User Administration & Security
 
-5.2 Sales & Distribution (SD)
-VBAK / VBAP: Sales Order header and item
-VBKD: Business data (Price/Tax)
-VBRK / VBRP: Billing header and item
-LIKP / LIPS: Delivery header and item
-VBFA: Document flow
-KONH / KONP: Condition header and item (Pricing)
+USR01 / USR03 – User Master + Address Data
+USR02 – User Logon Data (incl. Lock Status)
+USR21 – User ↔ Address Key Assignment
+USR04 / UST04 – User Authorizations & Profiles
+USR05 – User Parameter IDs
+USR10 – Authorization Profiles
+USR12 – Authorization Values
+UST12 – Authorizations
+TOBJ / TOBC – Authorization Objects & Classes
+USOBT – Transaction → Authorization Object
+TSTCA – Transaction → Authorizations
+USR40 – Prohibited Passwords
+DEVACCESS – Developer Keys
+USR41 – User Logon Data (SM04)
 
-5.3 Materials Management & Purchasing (MM)
-EKKO / EKPO: Purchasing document header and item
-EBAN: Purchase requisition
-EINA / EINE: Purchase info record (General/Org data)
-MKPF / MSEG: Material document header and item (Goods movements)
 
-5.4 Production Planning (PP)
-AUFK / AFKO: Production order header data
-AFPO: Production order item
-RESB: Reservations/Order components
-STKO / STPO: BOM header and item
-PLKO / PLPO: Routing header and operation
-CRHD: Work center header
+System Monitoring & Logs
 
-6. Human Resources (HR/HCM)
-PA0001: Organizational Assignment
-PA0002: Personal Data
-PA0007: Planned Working Time
-PA0008: Basic Pay
-T501 / T503: Employee groups and subgroups
+SNAP – ABAP Runtime Errors (Short Dumps)
+CDHDR / CDPOS – Change Document Header & Items
+DBTABLOG – Table Change Logs
+TBTCO / TBTCP – Background Jobs (Header + Steps)
+APQI / APQD – Batch Input Queue & Data
+E070 / E071 / E070C / E070V – Transport Requests & Tasks
+TLOCK – Lock Table for Transports
+JCDS / JEST – Status Change Documents
+JSTO – Status Object Information
+
+
+Spool, Text, Smart Forms & Printing
+
+TSP01 – Spool Requests
+TSP02 – Print Requests
+TST01 / TST03 – TemSe (Temporary Sequential) Objects
+STXH / STXL – SAPscript Text Header & Lines
+STXFADM – Smart Forms Administration
+STXB – Texts in Non-SAPscript Format
+TTXOB / TTXID – Valid Text Objects & Text IDs
+DOKIL / DOKHL / DOKTL – Documentation Tables
+
+
+Number Ranges & Variants
+
+NRIV – Number Range Intervals
+TNRO – Number Range Objects
+VARID / TVARV / VARI / VARIS – Report Variants & Variables
+LTDX / LTDXD / LTDXS – ALV Display Layouts & Defaults
+TCVIEW – Table Control Views (User Settings)
+
+
+Enterprise Structure & Global Settings
+Global Settings
+
+T000 / T001 – Clients & Company Codes
+T880 – Global Company Data
+T005 / T005T – Countries
+T006 – Units of Measure
+TCURC / TCURT – Currency Codes & Texts
+TCURR / TCURX – Exchange Rates & Decimal Places
+T009 – Fiscal Year Variants
+T010O / T010P – Posting Period Variants
+TFACD – Factory Calendar
+TTZZ / TTZD – Time Zones & Summer Time Rules
+T247 / T015M – Month Names
+
+Organizational Structure
+
+TKA01 / TKA02 – Controlling Areas
+T001W / T001L – Plants & Storage Locations
+TVKO / TVTW / TSPA – Sales Organization, Distribution Channel, Division
+T024E / T024W – Purchasing Organization
+TVST – Shipping Points
+TGSB – Business Areas
+
+
+Master Data
+Material Master
+
+MARA / MAKT – General Material Data + Descriptions
+MARC – Plant Data
+MARD – Storage Location Data
+MVKE – Sales Data
+MBEW – Valuation Data
+MARM – Unit of Measure Conversions
+
+Customer Master
+
+KNA1 – Customer General Data
+KNB1 – Customer Company Code Data
+KNVV – Customer Sales Area Data
+KNVP – Customer Partner Functions
+KNBK – Customer Bank Details
+
+Vendor Master
+
+LFA1 – Vendor General Data
+LFB1 – Vendor Company Code Data
+LFM1 / LFM2 – Vendor Purchasing Organization Data
+
+Classification
+
+CABN / CABNT – Characteristics
+KLAH – Class Header
+KSSK – Object to Class Assignment
+AUSP – Characteristic Values
+
+Business Address Services (BAS)
+
+ADRC – Addresses
+ADRP – Persons
+ADCP – Person ↔ Address Assignment
+ADR2 – Telephone Numbers
+
+
+Financial Accounting (FI)
+G/L Accounts
+
+SKA1 / SKAT – G/L Accounts (Chart of Accounts)
+SKB1 – G/L Accounts (Company Code)
+T004 – Chart of Accounts Directory
+
+Accounting Documents
+
+BKPF – Accounting Document Header
+BSEG – Accounting Document Line Items
+BSID / BSAD – Customer Open / Cleared Items
+BSIK / BSAK – Vendor Open / Cleared Items
+BSIS / BSAS – G/L Open / Cleared Items
+BSET – Tax Data
+GLT0 – G/L Transaction Figures
+
+Cost Centers & Controlling
+
+CSKS / CSKT – Cost Center Master + Texts
+CSKA / CSKB / CSKU – Cost Elements
+CEPC – Profit Center Master
+TKA01 / TKA02 – Controlling Area
+
+Banks & House Banks
+
+BNKA – Bank Master
+T012 / T012K – House Banks & Accounts
+
+
+Sales & Distribution (SD)
+
+VBAK / VBAP – Sales Order Header & Items
+VBKD – Sales Order Business Data
+VBRK / VBRP – Billing Document Header & Items
+LIKP / LIPS – Delivery Header & Items
+VBFA – Sales Document Flow
+KONH / KONP – Pricing Condition Header & Items
+
+
+Materials Management (MM)
+
+EKKO / EKPO – Purchase Order Header & Items
+EBAN – Purchase Requisition
+EINA / EINE – Purchase Info Records
+MKPF / MSEG – Material Document (Goods Movement) Header & Items
+
+
+Production Planning (PP)
+
+AUFK / AFKO / AFPO – Production Order Header & Items
+RESB – Reservations / Order Components
+STKO / STPO – BOM Header & Items
+PLKO / PLPO – Routing Header & Operations
+CRHD – Work Center Header
+
+
+Human Resources (HR/HCM)
+
+PA0001 – Organizational Assignment
+PA0002 – Personal Data
+PA0007 – Planned Working Time
+PA0008 – Basic Pay
+T501 / T503 – Employee Groups & Subgroups
+
+
+Additional Useful Tables
+Payment & Treasury
+
+T042* – Payment Program Configuration (many tables)
+REGUH / REGUP – Payment Run Data
+
+Archiving & Others
+
+ARCH_OBJ – Archiving Objects
