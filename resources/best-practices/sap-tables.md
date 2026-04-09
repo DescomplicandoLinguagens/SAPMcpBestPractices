@@ -183,6 +183,3 @@
 | **PA0001**| Organizational Assignment            |
 | **PA0002**| Personal Data                        |
 | **PA0008**| Basic Pay                            |
-
-
-> This markdown is optimized for GitHub, Obsidian, Typora, and most Markdown viewers.
